@@ -3,7 +3,7 @@ import math
 import cvzone
 from ultralytics import YOLO
 
-#loading the trained YOLO model
+#loading the trained YOLO model, trained in Google Colab and saved in the Weights folder (best.pt)
 yolo_model = YOLO("Weights/best.pt")
 
 #defining class names
