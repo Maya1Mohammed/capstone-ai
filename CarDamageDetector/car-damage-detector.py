@@ -4,7 +4,7 @@ import cvzone
 from ultralytics import YOLO
 
 #loading the trained YOLO model, trained in Google Colab and saved in the Weights folder (best.pt)
-yolo_model = YOLO("Weights/best.pt")
+yolo_model = YOLO(r"CarDamageDetector\Weights\best.pt")
 
 #defining class names
 class_labels = ["Front-Windscreen-Damage", "Headlight-Damage", "Rear-windscreen-Damage",
@@ -13,7 +13,7 @@ class_labels = ["Front-Windscreen-Damage", "Headlight-Damage", "Rear-windscreen-
                 "front-bumper-dent", "quaterpanel-dent", "rear-bumper-dent"]
 
 #loading the input image
-image_path = "Media/dent_1.jpg"
+image_path = r"CarDamageDetector\Media\dent_2.jpg"
 img = cv2.imread(image_path)
 
 #object detection using the YOLO model
