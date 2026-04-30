@@ -5,7 +5,7 @@ import math
 from ultralytics import YOLO
 
 app = FastAPI()
-model = YOLO(r"CarDamageDetector\Weights\best.pt")
+model = YOLO(r"Weights\best.pt")
 
 CLASS_LABELS = [
     "Front-Windscreen-Damage", "Headlight-Damage", "Rear-windscreen-Damage",
