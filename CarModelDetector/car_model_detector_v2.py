@@ -15,14 +15,14 @@ REFERENCE_PATH = "reference_centroids.npz"
 IMG_SIZE = 224
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-TEMPERATURE = 4.0
-CONF_THRESHOLD_MAKE = 60.0
-CONF_THRESHOLD_MODEL = 50.0
-CONF_THRESHOLD_YEAR = 55.0
+TEMPERATURE = 2.0
+CONF_THRESHOLD_MAKE = 45.0
+CONF_THRESHOLD_MODEL = 40.0
+CONF_THRESHOLD_YEAR = 45.0
 
 # Cosine similarity threshold on ImageNet features.
-# OOD cars (unknown make) typically score below 0.80 vs known-make centroids.
-COSINE_SIM_THRESHOLD = 0.90
+# OOD cars (unknown make) typically score below 0.70 vs known-make centroids.
+COSINE_SIM_THRESHOLD = 0.75
 
 
 def load_encoder(name):
@@ -51,7 +51,7 @@ class MultiHeadResNet50(nn.Module):
             nn.Flatten(),
             nn.Linear(2048, 512),
             nn.ReLU(),
-            nn.Dropout(0, 4),
+            nn.Dropout(0.4),
         )
         self.head_make = nn.Linear(512, num_makes)
         self.head_model = nn.Linear(512, num_models)
