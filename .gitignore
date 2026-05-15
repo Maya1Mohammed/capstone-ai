@@ -1,4 +1,6 @@
 venv/
 *.pt
+*.pth
+reference_centroids.npz
 __pycache__/
 *.pyc
