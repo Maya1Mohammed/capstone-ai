@@ -1,0 +1,14 @@
+{
+  "Front-Windscreen-Damage": 0,
+  "Headlight-Damage": 1,
+  "Rear-windscreen-Damage": 2,
+  "Sidemirror-Damage": 3,
+  "Taillight-Damage": 4,
+  "bonnet-dent": 5,
+  "boot-dent": 6,
+  "doorouter-dent": 7,
+  "fender-dent": 8,
+  "front-bumper-dent": 9,
+  "quaterpanel-dent": 10,
+  "rear-bumper-dent": 11
+}

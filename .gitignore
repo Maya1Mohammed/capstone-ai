@@ -1,6 +1,7 @@
 venv/
 *.pt
 *.pth
+*.pkl
 reference_centroids.npz
 __pycache__/
 *.pyc
