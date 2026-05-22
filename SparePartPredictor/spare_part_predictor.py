@@ -4,7 +4,7 @@ import os
 
 # Congif
 MODEL_PATH = "price_model.pkl"
-ENCODER_DIR = "encoders"
+ENCODER_DIR = "price_encoders"
 
 # Load model and encoders once at startup
 with open(MODEL_PATH, "rb") as f:
