@@ -7,27 +7,20 @@ A computer vision capstone project that analyzes car images to detect damage, id
 ## Architecture Overview
 
 ```
-Image Upload
-     │
-     ▼
-┌─────────────────────────────────────┐
-│         Unified API (main.py)       │
-│  POST /detect  ·  GET /health       │
-└──────────┬──────────────────┬───────┘
-           │                  │
+Image Upload                     JSON Body
+     │                               │
+     ▼                               ▼
+┌─────────────────────────────────────────────────────┐
+│                Unified API (main.py)                │
+│   GET /health · POST /detect · POST /estimate       │
+└──────────┬──────────────────┬───────────────────────┘
+           │ /detect           │ /estimate
            ▼                  ▼
-  ┌─────────────────┐  ┌──────────────────┐
-  │ Car Damage      │  │ Car Model        │
-  │ Detector        │  │ Detector         │
-  │ (YOLOv8)        │  │ (ResNet50)       │
-  └────────┬────────┘  └──────────────────┘
-           │
-           ▼
-  ┌─────────────────┐
-  │ Spare Part      │
-  │ Predictor       │
-  │ (Random Forest) │
-  └─────────────────┘
+  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐
+  │ Car Damage   │  │ Car Model    │  │ Spare Part       │
+  │ Detector     │  │ Detector     │  │ Predictor        │
+  │ (YOLOv8)     │  │ (ResNet50)   │  │ (Random Forest)  │
+  └──────────────┘  └──────────────┘  └──────────────────┘
 ```
 
 ---
@@ -185,7 +178,7 @@ uvicorn api:app --reload
 
 ## Unified API (main.py)
 
-The primary entry point. Loads all three models on startup and exposes a single endpoint that runs damage detection and vehicle identification in one call. The spare part predictor is called automatically using the vehicle and damage results.
+The primary entry point. Loads all three models on startup and exposes three endpoints: damage + vehicle identification from an image upload, and a separate price estimation call that accepts the results of the first.
 
 ```bash
 python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
@@ -195,16 +188,27 @@ python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/health` | Returns status of all model weight files |
-| `POST` | `/detect` | Accepts a multipart image; returns damage + vehicle + price estimates |
+| `GET` | `/health` | Returns status of all three model weight files |
+| `POST` | `/detect` | Accepts a multipart image; returns damage detections + vehicle identity |
+| `POST` | `/estimate` | Accepts vehicle info + damaged part names; returns price estimates per part |
 
-### Response shape
+### `POST /detect`
+
+**Request:** multipart form upload (`file` field)
+
+**Response:**
 
 ```json
 {
   "damage": {
     "status": "damage_detected",
-    "detections": [...]
+    "detections": [
+      {
+        "class": "front-bumper-dent",
+        "confidence": 0.85,
+        "bbox": { "x1": 100, "y1": 50, "x2": 200, "y2": 150 }
+      }
+    ]
   },
   "vehicle": {
     "make": "ford",
@@ -212,16 +216,31 @@ python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
     "year_range": "2013_2016",
     "confidence": { "make": 78.5, "model": 92.1, "year_range": 45.0 },
     "supported_makes": ["changan", "ford", "volkswagen"]
-  },
-  "spare_parts": [
-    {
-      "part_name": "front-bumper-dent",
-      "original_new": 250.0,
-      "original_used": 70.0,
-      "aftermarket": 45.0
-    }
-  ]
+  }
 }
+```
+
+### `POST /estimate`
+
+**Request:**
+
+```json
+{
+  "make": "ford",
+  "model_name": "fusion",
+  "year_range": "2013_2016",
+  "damaged_parts": ["front-bumper-dent", "Headlight-Damage", "bonnet-dent"]
+}
+```
+
+**Response:**
+
+```json
+[
+  { "part_name": "front-bumper-dent", "original_new": 250.0, "original_used": 70.0, "aftermarket": 45.0 },
+  { "part_name": "Headlight-Damage",  "original_new": 239.8, "original_used": 62.4, "aftermarket": 52.8 },
+  { "part_name": "bonnet-dent",       "original_new": 399.5, "original_used": 102.3, "aftermarket": 84.6 }
+]
 ```
 
 ---
